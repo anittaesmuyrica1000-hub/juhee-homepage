@@ -1,4 +1,4 @@
-import type { Project } from "@/lib/content";
+import type { Project } from "@/lib/types";
 
 export default function ProjectCard({
   project,
@@ -7,21 +7,36 @@ export default function ProjectCard({
   project: Project;
   index: number;
 }) {
-  const [from, to] = project.palette;
+  const [from, to] = project.palette.length >= 2 ? project.palette : ["#ddd8cf", "#2b2b2b"];
+  const hasImage = Boolean(project.image_url);
+
   return (
     <a
-      href={`#${project.id}`}
+      href={`#${project.slug}`}
       className="group block"
       aria-label={`${project.title} 프로젝트 보기`}
     >
-      <div className="relative aspect-[4/5] overflow-hidden rounded-lg">
-        <div
-          className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-105"
-          style={{
-            background: `linear-gradient(150deg, ${from} 0%, ${to} 100%)`,
-          }}
-        />
-        {/* 활자 중심 플레이스홀더 비주얼 */}
+      <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-ink/5">
+        {hasImage ? (
+          // 업로드된 실제 이미지
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={project.image_url as string}
+            alt={`${project.title} 대표 이미지`}
+            loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          />
+        ) : (
+          // 이미지가 없으면 팔레트 그라데이션 폴백
+          <div
+            className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-105"
+            style={{
+              background: `linear-gradient(150deg, ${from} 0%, ${to} 100%)`,
+            }}
+          />
+        )}
+
+        {/* 카테고리 / 클라이언트 오버레이 */}
         <div className="absolute inset-0 flex flex-col justify-between p-6 mix-blend-difference">
           <span className="font-mono text-xs uppercase tracking-[0.2em] text-white/80">
             {project.category}

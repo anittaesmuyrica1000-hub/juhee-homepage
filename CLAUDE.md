@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Single-page portfolio site for **Kim Juhee (김주희)**, a graphic & branding designer. Korean-language (`<html lang="ko">`). Built with Next.js 16 (App Router, Turbopack), React 19, TypeScript, and Tailwind CSS v4.
+Single-page portfolio site for **Kim Juhee (김주희)**, a graphic & branding designer. Korean-language (`<html lang="ko">`). Built with Next.js 16 (App Router, Turbopack), React 19, TypeScript, and Tailwind CSS v4. The public page is one scroll route; **Work projects are managed via a password-protected admin (`/admin`) backed by Supabase** (Postgres + Storage). See `docs/structure.md` (public sections) and `docs/admin.md` (admin internals).
 
 ## Commands
 
@@ -18,11 +18,13 @@ No test suite exists. There is no separate typecheck script — `npm run build` 
 
 ## Architecture
 
-The entire site is one route. `app/page.tsx` composes every section inline (Hero → clients marquee → Selected Work → About → Services → Contact → footer); there are no nested routes or per-section page files. To restructure the page, edit `page.tsx` directly.
+The public page is one route. `app/page.tsx` composes every section inline (Hero → clients marquee → Selected Work → About → Services → Contact → footer). To restructure the page, edit `page.tsx` directly.
 
-- **`lib/content.ts`** is the single source of truth for all displayed content — profile, `projects[]`, `services[]`, `clients[]`. It is currently **placeholder data**; real portfolio content is edited here, not in the JSX. Project card visuals are CSS gradients driven by each project's `palette` tuple (no image assets yet).
-- **Server vs client components**: sections are server-rendered by default. Only `components/Nav.tsx` (scroll/menu state) and `components/Reveal.tsx` (IntersectionObserver scroll-in animation) are `"use client"`. Keep new interactive pieces in their own client component rather than converting `page.tsx`.
-- **`@/*` path alias** maps to the repo root (see `tsconfig.json`), e.g. `import { profile } from "@/lib/content"`.
+- **Two content sources.** Static copy (profile, `services[]`, `clients[]`) lives in **`lib/content.ts`** and is edited in code. **Work projects are dynamic**, stored in Supabase and edited through the admin — never hardcode projects in `content.ts` again. `app/page.tsx` is an async server component that calls `getProjects()` (`lib/projects.ts`); it sets `revalidate = 0` so admin edits show immediately.
+- **Supabase layer** (`lib/supabase.ts`): `supabasePublic` (publishable key, read-only, used by the public page) vs `createAdminClient()` (secret key, RLS-bypassing, **server-only** — used only inside `/api/admin/*` routes). Types in `lib/types.ts`. A project's card shows its uploaded `image_url`, falling back to a `palette` gradient.
+- **Admin** lives under `app/admin/*` + `app/api/admin/*`, gated by `proxy.ts` (Next 16's renamed middleware — the file MUST be `proxy.ts` with an exported `proxy` function, not `middleware`). Auth is a single `ADMIN_PASSWORD` → HMAC session cookie (`lib/auth.ts` for edge+node, `lib/admin-guard.ts` for route handlers). Full details in `docs/admin.md`.
+- **Server vs client components**: sections are server-rendered by default. `components/Nav.tsx`, `components/Reveal.tsx`, and everything under `components/admin/` are `"use client"`. Keep new interactive pieces in their own client component rather than converting `page.tsx`.
+- **`@/*` path alias** maps to the repo root (see `tsconfig.json`), e.g. `import { getProjects } from "@/lib/projects"`.
 
 ## Styling (Tailwind v4)
 
@@ -34,7 +36,7 @@ There is no `tailwind.config.js`. The design system lives in `app/globals.css`:
 ## Deployment & Git
 
 - Remote `origin` is GitHub (`juhee-homepage`). Pushes authenticate with a token kept in `.env` (gitignored via `.env*` — never commit it). The repo deploys to Vercel.
-- `.env.local.example` documents Supabase/Postgres env vars carried over from a prior project; they are **not used** by the current static portfolio.
+- **Required env vars** (`.env` locally, Vercel project settings in prod): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (public read), `SUPABASE_SECRET_KEY` (server-only writes/uploads), `ADMIN_PASSWORD` (admin login). See `.env.local.example`. If `SUPABASE_SECRET_KEY` is missing/invalid, reads and login still work but admin saves/uploads fail with "Invalid API key".
 
 ### Auto-push rule (default workflow)
 

@@ -1,9 +1,14 @@
 import Nav from "@/components/Nav";
 import Reveal from "@/components/Reveal";
 import ProjectCard from "@/components/ProjectCard";
-import { profile, projects, services, clients } from "@/lib/content";
+import { profile, services, clients } from "@/lib/content";
+import { getProjects } from "@/lib/projects";
 
-export default function Home() {
+// 관리자 편집이 즉시 반영되도록 매 요청 시 최신 데이터를 읽습니다.
+export const revalidate = 0;
+
+export default async function Home() {
+  const projects = await getProjects();
   return (
     <>
       <Nav />
