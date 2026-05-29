@@ -1,434 +1,84 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: "Pretendard", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --font-display: "Playfair Display", "Pretendard", ui-serif, Georgia, serif;
+
+  --color-ink: #111110;
+  --color-paper: #f5f3ee;
+  --color-accent: #e2462f;
+  --color-muted: #8a857c;
+}
+
 @font-face {
-  font-family: "Pretendard Variable";
+  font-family: "Pretendard";
   font-weight: 45 920;
-  font-style: normal;
   font-display: swap;
   src: url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/woff2/PretendardVariable.woff2")
     format("woff2-variations");
 }
 
 :root {
-  /* Brand palette (기획문서 9.1) */
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-primary-light: #dbeafe;
-  --color-bg: #ffffff;
-  --color-bg-alt: #f8f9fa;
-  --color-bg-dark: #1a1a2e;
-  --color-text: #1e2229;
-  --color-text-sub: #6b7280;
-  --color-border: #e5e7eb;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-
-  /* Website container (makipeople.com 레퍼런스)
-     - 데스크톱 상한: 88rem = 1408px
-     - 좌우 여백: 3.5rem = 56px
-     - 실제 콘텐츠 최대폭: 1408 − 112 = 1296px
-     - 수식: width = min(100%, size) − padding × 2 */
-  --container-size: 88rem;
-  --container-padding: 3.5rem;
+  color-scheme: light;
 }
 
-/* 모바일/태블릿에서는 좌우 여백을 줄인다 */
-@media (max-width: 768px) {
-  :root {
-    --container-padding: 1.25rem; /* 20px */
-  }
-}
-@media (min-width: 769px) and (max-width: 1024px) {
-  :root {
-    --container-padding: 2rem; /* 32px */
-  }
-}
-
-/* 레이아웃 컨테이너 (makipeople.com 의 g_page--container 규칙 포팅)
-   className="wp-container" 으로 사용. Tailwind 변형자 불필요한 순수 CSS 클래스. */
-.wp-container {
-  width: calc(min(100%, var(--container-size)) - var(--container-padding) * 2);
-  margin-inline: auto;
-}
-
-/* Hero 우측 5 단계 프로세스 시퀀셜 애니메이션.
-   - 사이클 = 7.5s (5 스텝 × 1.5s).
-   - 각 스텝 등장 지연 = index × 1.5s.
-   - 활성 스텝은 선명, 이미 지나간 스텝은 디밍 상태.
-   - 파란 dot 은 라인을 따라 위에서 아래로 이동. */
-
-/* 배경 점선 라인 (배지 z-10 밑, z-0) */
-.hero-visual .hv-line {
-  background-image: repeating-linear-gradient(
-    to bottom,
-    #e5e7eb 0 4px,
-    transparent 4px 8px
-  );
-}
-
-/* 스텝 등장 + 유지 + 디밍 */
-@keyframes hv-step-in {
-  0%, 10% {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  20% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  35% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  45%, 100% {
-    opacity: 0.4;
-    transform: translateX(0);
-  }
-}
-
-/* 배지 펄스: 활성 시 밝아지고 링 확장 */
-@keyframes hv-badge-pulse {
-  0%, 10% {
-    transform: scale(0.9);
-    filter: brightness(0.85) saturate(0.85);
-    box-shadow: 0 4px 10px rgba(33, 68, 165, 0.1);
-  }
-  20% {
-    transform: scale(1.04);
-    filter: brightness(1.05) saturate(1.05);
-    box-shadow: 0 10px 24px rgba(33, 68, 165, 0.3);
-  }
-  35% {
-    transform: scale(1);
-    filter: brightness(1) saturate(1);
-    box-shadow: 0 6px 16px rgba(33, 68, 165, 0.2);
-  }
-  45%, 100% {
-    transform: scale(0.92);
-    filter: brightness(0.85) saturate(0.85);
-    box-shadow: 0 4px 10px rgba(33, 68, 165, 0.1);
-  }
-}
-
-.hero-visual .hv-step {
-  animation: hv-step-in 7.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  animation-delay: calc(var(--step-index) * 1.5s);
-}
-.hero-visual .hv-step-badge {
-  animation: hv-badge-pulse 7.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  animation-delay: calc(var(--step-index) * 1.5s);
-}
-
-/* 파란 진행 dot 이 첫 배지 중심 → 마지막 배지 중심으로 이동.
-   top 범위는 [0.5rem + 31, calc(100% - 0.5rem - 41)] (10px dot 보정 반영).
-   5 스텝 구조에 맞춰 20% 단위로 snap. */
-@keyframes hv-dot-travel {
-  0%, 10% {
-    top: calc(0.5rem + 31px);
-  }
-  15%, 25% {
-    top: calc(((100% - 1rem - 72px) * 1 / 4) + 0.5rem + 31px);
-  }
-  30%, 40% {
-    top: calc(((100% - 1rem - 72px) * 2 / 4) + 0.5rem + 31px);
-  }
-  45%, 55% {
-    top: calc(((100% - 1rem - 72px) * 3 / 4) + 0.5rem + 31px);
-  }
-  60%, 70% {
-    top: calc(((100% - 1rem - 72px) * 4 / 4) + 0.5rem + 31px);
-  }
-  75%, 90% {
-    top: calc(((100% - 1rem - 72px) * 4 / 4) + 0.5rem + 31px);
-  }
-  100% {
-    top: calc(0.5rem + 31px);
-  }
-}
-.hero-visual .hv-dot {
-  animation: hv-dot-travel 7.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-
-/* 접근성: 모션 민감 사용자 */
-@media (prefers-reduced-motion: reduce) {
-  .hero-visual .hv-step,
-  .hero-visual .hv-step-badge,
-  .hero-visual .hv-progress-line {
-    animation: none;
-  }
-  .hero-visual .hv-step {
-    opacity: 1;
-  }
-}
-
-/* 그라디언트 방사형 유틸 (Tailwind v4 에서 쓰기 위한 쇼트컷) */
-.bg-gradient-radial {
-  background-image: radial-gradient(circle, var(--tw-gradient-stops));
-}
-
-/* Blog 본문 prose 스타일 — Tiptap JSON 렌더 결과에 적용.
-   일관된 타이포그래피 (Pretendard 기준) + 브랜드 블루 링크. */
-.prose-blog {
-  color: #282828;
-  font-size: 17px;
-  line-height: 1.75;
-}
-.prose-blog > * + * {
-  margin-top: 1.1em;
-}
-.prose-blog h1 {
-  margin-top: 2em;
-  font-size: 2rem;
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-}
-.prose-blog h2 {
-  margin-top: 1.75em;
-  font-size: 1.5rem;
-  font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: -0.005em;
-}
-.prose-blog h3 {
-  margin-top: 1.5em;
-  font-size: 1.25rem;
-  font-weight: 600;
-  line-height: 1.3;
-}
-.prose-blog p {
-  color: #282828;
-}
-.prose-blog a {
-  color: var(--color-primary);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
-}
-.prose-blog a:hover {
-  color: var(--color-primary-hover);
-}
-.prose-blog strong {
-  font-weight: 600;
-}
-.prose-blog em {
-  font-style: italic;
-}
-.prose-blog ul,
-.prose-blog ol {
-  padding-left: 1.5em;
-}
-.prose-blog ul {
-  list-style: disc;
-}
-.prose-blog ol {
-  list-style: decimal;
-}
-.prose-blog li {
-  margin: 0.35em 0;
-}
-.prose-blog li > p {
-  margin: 0;
-}
-.prose-blog blockquote {
-  border-left: 3px solid var(--color-primary);
-  padding: 0.25em 0 0.25em 1.25em;
-  color: #5f6363;
-  font-style: italic;
-}
-.prose-blog blockquote p {
-  color: #5f6363;
-}
-.prose-blog img {
-  border-radius: 0.75rem;
-  border: 1px solid var(--color-border);
-  max-width: 100%;
-  height: auto;
-}
-.prose-blog pre {
-  background: #0b1b4a;
-  color: #e7edff;
-  padding: 1rem 1.25rem;
-  border-radius: 0.75rem;
-  overflow-x: auto;
-  font-size: 0.875rem;
-  line-height: 1.55;
-}
-.prose-blog pre code {
-  background: transparent;
-  padding: 0;
-  color: inherit;
-  font-size: inherit;
-}
-.prose-blog code {
-  background: #eff4ff;
-  color: var(--color-primary);
-  padding: 0.125em 0.375em;
-  border-radius: 0.25rem;
-  font-size: 0.9em;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-}
-.prose-blog hr {
-  margin: 2em 0;
-  border: 0;
-  border-top: 1px solid var(--color-border);
-}
-.prose-blog table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1.5em 0;
-  font-size: 0.9em;
-}
-.prose-blog th,
-.prose-blog td {
-  border: 1px solid var(--color-border);
-  padding: 0.5rem 0.875rem;
-  text-align: left;
-}
-.prose-blog th {
-  background: #f8f9fa;
-  font-weight: 600;
-}
-.prose-blog iframe {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border: 0;
-  border-radius: 0.75rem;
-}
-.prose-blog h1:first-child,
-.prose-blog h2:first-child,
-.prose-blog h3:first-child {
-  margin-top: 0;
-}
-
-/* InterviewLive — SolutionBridge 우측 카드의 인물 배경 위 채팅 무한 루프.
-   사이클 = 13s. 5개 요소가 차례로 페이드인 → 모두 페이드아웃 → 반복.
-   각 요소는 자신의 등장 시점만 다른 키프레임을 사용 (동시 페이드아웃은 92~100% 구간 공유). */
-@keyframes ilv-bubble-1 {
-  0%, 4%   { opacity: 0; transform: translateY(8px); }
-  7%, 88%  { opacity: 1; transform: translateY(0); }
-  92%,100% { opacity: 0; transform: translateY(-4px); }
-}
-@keyframes ilv-bubble-2 {
-  0%, 18%  { opacity: 0; transform: translateY(8px); }
-  22%, 88% { opacity: 1; transform: translateY(0); }
-  92%,100% { opacity: 0; transform: translateY(-4px); }
-}
-@keyframes ilv-bubble-3 {
-  0%, 36%  { opacity: 0; transform: translateY(8px); }
-  40%, 88% { opacity: 1; transform: translateY(0); }
-  92%,100% { opacity: 0; transform: translateY(-4px); }
-}
-@keyframes ilv-bubble-4 {
-  0%, 54%  { opacity: 0; transform: translateY(8px); }
-  58%, 88% { opacity: 1; transform: translateY(0); }
-  92%,100% { opacity: 0; transform: translateY(-4px); }
-}
-@keyframes ilv-bubble-5 {
-  0%, 72%  { opacity: 0; transform: translateY(8px); }
-  76%, 88% { opacity: 1; transform: translateY(0); }
-  92%,100% { opacity: 0; transform: translateY(-4px); }
-}
-@keyframes ilv-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%      { opacity: 0.4; transform: scale(0.85); }
-}
-
-.ilv-bubble {
-  opacity: 0;
-  will-change: opacity, transform;
-}
-.ilv-b1 { animation: ilv-bubble-1 13s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
-.ilv-b2 { animation: ilv-bubble-2 13s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
-.ilv-b3 { animation: ilv-bubble-3 13s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
-.ilv-b4 { animation: ilv-bubble-4 13s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
-.ilv-b5 { animation: ilv-bubble-5 13s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
-.ilv-pulse { animation: ilv-pulse 1.4s ease-in-out infinite; }
-
-@media (prefers-reduced-motion: reduce) {
-  .ilv-bubble,
-  .ilv-pulse {
-    animation: none;
-    opacity: 1;
-  }
-}
-
-/* Logo marquee (Maki .c_logo_marquee--cms scroll animation).
-   2-set 복제된 트랙을 translateX(-50%) 로 이동 = 정확히 한 세트 길이만큼 이동.
-   duration 25s linear infinite — 모션 민감 사용자 대응. */
-@keyframes logo-marquee-scroll {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-.lm-track {
-  animation: logo-marquee-scroll 25s linear infinite;
-  will-change: transform;
-}
-@media (prefers-reduced-motion: reduce) {
-  .lm-track {
-    animation: none;
-  }
-}
-
-@theme inline {
-  --color-background: var(--color-bg);
-  --color-foreground: var(--color-text);
-
-  --color-brand: var(--color-primary);
-  --color-brand-hover: var(--color-primary-hover);
-  --color-brand-light: var(--color-primary-light);
-
-  --color-surface: var(--color-bg);
-  --color-surface-alt: var(--color-bg-alt);
-  --color-surface-dark: var(--color-bg-dark);
-
-  --color-muted: var(--color-text-sub);
-  --color-border-subtle: var(--color-border);
-
-  --color-success: var(--color-success);
-  --color-warning: var(--color-warning);
-  --color-error: var(--color-error);
-
-  --font-sans:
-    "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
-    system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo",
-    "Noto Sans KR", "Malgun Gothic", sans-serif;
-
-  /* Typography scale (기획문서 9.2) */
-  --text-display: 3.5rem; /* 56px */
-  --text-display-mobile: 2rem; /* 32px */
-  --text-h1: 2.75rem; /* 44px */
-  --text-h1-mobile: 1.75rem; /* 28px */
-  --text-h2: 1.75rem; /* 28px */
-  --text-h2-mobile: 1.375rem; /* 22px */
-  --text-h3: 1.25rem; /* 20px */
-  --text-h3-mobile: 1.125rem; /* 18px */
-  --text-body: 1rem; /* 16px */
-  --text-body-sm: 0.875rem; /* 14px */
-  --text-caption: 0.75rem; /* 12px */
-}
-
-html,
-body {
-  height: 100%;
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background-color: var(--color-bg);
-  color: var(--color-text);
+  background: var(--color-paper);
+  color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+::selection {
+  background: var(--color-accent);
+  color: var(--color-paper);
+}
+
+/* Reveal-on-scroll handled via CSS only for graceful no-JS fallback */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal {
+  animation: fade-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    animation: none;
+  }
+}
+
+/* Marquee */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  animation: marquee 28s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
 }
