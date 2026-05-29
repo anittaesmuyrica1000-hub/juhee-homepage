@@ -24,7 +24,11 @@ export default function Home() {
                   <span className="block">
                     {i === 1 ? (
                       <>
-                        시각 언어로 <span className="italic text-accent">번역</span>합니다.
+                        시각 언어로{" "}
+                        <span className="italic text-accent inline-block pr-[0.12em]">
+                          번역
+                        </span>
+                        합니다.
                       </>
                     ) : (
                       line
