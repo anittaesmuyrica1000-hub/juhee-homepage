@@ -1,4 +1,5 @@
 import Nav from "@/components/Nav";
+import Hero from "@/components/Hero";
 import Reveal from "@/components/Reveal";
 import ProjectCard from "@/components/ProjectCard";
 import { Eyebrow, SectionHeading } from "@/components/ui";
@@ -14,55 +15,8 @@ export default async function Home() {
     <>
       <Nav />
       <main id="top">
-        {/* ───────────────── HERO ───────────────── */}
-        <section className="relative flex min-h-screen flex-col justify-center px-6 pt-28 pb-16 md:px-10">
-          <div className="mx-auto w-full max-w-7xl">
-            <Reveal>
-              <Eyebrow line className="mb-6">
-                {profile.role}
-              </Eyebrow>
-            </Reveal>
-
-            <h1 className="font-display text-[13vw] leading-[0.92] tracking-tight md:text-[8.5vw] lg:text-[7.5rem]">
-              {profile.tagline.split("\n").map((line, i) => (
-                <Reveal key={i} delay={120 + i * 120}>
-                  <span className="block">
-                    {i === 1 ? (
-                      <>
-                        시각 언어로{" "}
-                        <span className="italic text-accent inline-block pr-[0.12em]">
-                          번역
-                        </span>
-                        합니다.
-                      </>
-                    ) : (
-                      line
-                    )}
-                  </span>
-                </Reveal>
-              ))}
-            </h1>
-
-            <div className="mt-12 grid gap-8 md:grid-cols-[1fr_auto] md:items-end">
-              <Reveal delay={420}>
-                <p className="max-w-xl text-base leading-relaxed text-ink/70 md:text-lg">
-                  {profile.intro}
-                </p>
-              </Reveal>
-              <Reveal delay={520}>
-                <a
-                  href="#work"
-                  className="group inline-flex items-center gap-3 self-start text-sm font-medium tracking-wide"
-                >
-                  <span className="flex h-14 w-14 items-center justify-center rounded-full border border-ink/30 transition-colors group-hover:bg-ink group-hover:text-paper">
-                    ↓
-                  </span>
-                  작업 보기
-                </a>
-              </Reveal>
-            </div>
-          </div>
-        </section>
+        {/* ───────────────── HERO (Spline 3D) ───────────────── */}
+        <Hero />
 
         {/* ───────────────── MARQUEE ───────────────── */}
         <section className="overflow-hidden border-y border-ink/10 py-5">

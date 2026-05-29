@@ -1,4 +1,2 @@
-// 가벼운 className 결합 유틸 (falsy 제거)
-export function cn(...classes: Array<string | false | null | undefined>): string {
-  return classes.filter(Boolean).join(" ");
-}
+// 단일 cn 구현(lib/utils)을 재노출 — 전체에서 동일한 병합 로직 사용
+export { cn } from "@/lib/utils";
