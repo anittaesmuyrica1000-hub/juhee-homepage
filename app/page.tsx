@@ -1,6 +1,6 @@
 import Nav from "@/components/Nav";
 import Reveal from "@/components/Reveal";
-import ProjectCard from "@/components/ProjectCard";
+import WorkGallery from "@/components/WorkGallery";
 import { profile, services, clients } from "@/lib/content";
 import { getProjects } from "@/lib/projects";
 
@@ -99,13 +99,7 @@ export default async function Home() {
               </div>
             </Reveal>
 
-            <div className="grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
-              {projects.map((p, i) => (
-                <Reveal key={p.id} delay={(i % 3) * 120}>
-                  <ProjectCard project={p} index={i} />
-                </Reveal>
-              ))}
-            </div>
+            <WorkGallery projects={projects} />
           </div>
         </section>
 
