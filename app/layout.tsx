@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
-import { Playfair_Display } from "next/font/google";
+import { Roboto } from "next/font/google";
+import Loader from "@/components/Loader";
 import "./globals.css";
 
-const playfair = Playfair_Display({
+// Plus X 톤의 헤비 그로테스크 (Roboto). 한글은 Pretendard 폴백.
+const roboto = Roboto({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "700", "800", "900"],
   style: ["normal", "italic"],
-  variable: "--font-playfair",
+  variable: "--font-roboto",
   display: "swap",
 });
 
@@ -52,8 +54,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" className={playfair.variable}>
-      <body>{children}</body>
+    <html lang="ko" className={roboto.variable}>
+      <body>
+        <Loader />
+        {children}
+      </body>
     </html>
   );
 }

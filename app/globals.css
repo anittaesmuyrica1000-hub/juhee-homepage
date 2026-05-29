@@ -1,14 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Pretendard", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-    Roboto, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
-  --font-display: var(--font-playfair), "Pretendard", ui-serif, Georgia, serif;
+  /* Plus X 스타일: Roboto + Pretendard 그로테스크. 본문/디스플레이 모두 산세리프. */
+  --font-sans: var(--font-roboto), "Pretendard", ui-sans-serif, system-ui,
+    -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --font-display: var(--font-roboto), "Pretendard", ui-sans-serif, system-ui,
+    "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
 
-  --color-ink: #111110;
-  --color-paper: #f5f3ee;
-  --color-accent: #e2462f;
-  --color-muted: #8a857c;
+  /* 모노크롬 + 시그니처 레드 (Plus X red ≈ #db1010) */
+  --color-ink: #0a0a0a;
+  --color-paper: #ffffff;
+  --color-accent: #db1010;
+  --color-muted: #8a8a8a;
 }
 
 @font-face {
@@ -38,6 +41,12 @@ body {
 ::selection {
   background: var(--color-accent);
   color: var(--color-paper);
+}
+
+/* 디스플레이 텍스트는 헤비 그로테스크 + 타이트 트래킹 (Plus X 톤) */
+.font-display {
+  font-weight: 800;
+  letter-spacing: -0.025em;
 }
 
 /* Reveal-on-scroll handled via CSS only for graceful no-JS fallback */
@@ -80,5 +89,37 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .marquee-track {
     animation: none;
+  }
+}
+
+/* ───────── 인트로 로더 (Plus X 스타일) ───────── */
+@keyframes loader-bar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* 로딩 완료 시 패널이 위로 걷히는 리빌 */
+@keyframes loader-reveal {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+.loader-leaving {
+  animation: loader-reveal 0.8s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader-leaving {
+    animation: none;
+    opacity: 0;
+    visibility: hidden;
   }
 }

@@ -1,4 +1,4 @@
-import { supabasePublic } from "./supabase";
+import { getPublicClient } from "./supabase";
 import type { Project } from "./types";
 
 /**
@@ -7,7 +7,7 @@ import type { Project } from "./types";
  */
 export async function getProjects(): Promise<Project[]> {
   try {
-    const { data, error } = await supabasePublic
+    const { data, error } = await getPublicClient()
       .from("projects")
       .select("*")
       .order("sort_order", { ascending: true });

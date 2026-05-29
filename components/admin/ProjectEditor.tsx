@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { Project } from "@/lib/types";
 
 export type EditorValue = {
@@ -41,6 +41,7 @@ export default function ProjectEditor({
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleUpload(file: File) {
     setUploading(true);
@@ -118,19 +119,26 @@ export default function ProjectEditor({
               )}
             </div>
             <div className="space-y-2 text-sm">
-              <label className="inline-block cursor-pointer rounded-full border border-ink/20 px-4 py-2 hover:bg-ink hover:text-paper">
+              {/* ref + button 방식: label/display:none 보다 모든 브라우저에서 확실히 picker 가 열림 */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) handleUpload(f);
+                  e.target.value = ""; // 같은 파일 재선택 가능하도록 초기화
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="inline-block rounded-full border border-ink/20 px-4 py-2 hover:bg-ink hover:text-paper disabled:opacity-40"
+              >
                 {uploading ? "업로드 중…" : imageUrl ? "이미지 교체" : "이미지 업로드"}
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  disabled={uploading}
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) handleUpload(f);
-                  }}
-                />
-              </label>
+              </button>
               {imageUrl && (
                 <button
                   type="button"
