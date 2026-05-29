@@ -14,6 +14,8 @@ function normalize(body: Partial<ProjectInput>): ProjectInput {
     tags: Array.isArray(body.tags) ? body.tags.map((t) => String(t).trim()).filter(Boolean) : [],
     image_url: body.image_url ? String(body.image_url) : null,
     palette: Array.isArray(body.palette) ? body.palette.map(String) : [],
+    body: typeof body.body === "string" ? body.body : "",
+    gallery: Array.isArray(body.gallery) ? body.gallery.map(String).filter(Boolean) : [],
     sort_order: Number.isFinite(body.sort_order) ? Number(body.sort_order) : 0,
   };
 }

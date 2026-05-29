@@ -1,6 +1,7 @@
 import Nav from "@/components/Nav";
 import Reveal from "@/components/Reveal";
-import WorkGallery from "@/components/WorkGallery";
+import ProjectCard from "@/components/ProjectCard";
+import { Eyebrow, SectionHeading } from "@/components/ui";
 import { profile, services, clients } from "@/lib/content";
 import { getProjects } from "@/lib/projects";
 
@@ -17,10 +18,9 @@ export default async function Home() {
         <section className="relative flex min-h-screen flex-col justify-center px-6 pt-28 pb-16 md:px-10">
           <div className="mx-auto w-full max-w-7xl">
             <Reveal>
-              <p className="mb-6 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.25em] text-muted">
-                <span className="inline-block h-px w-10 bg-accent" />
+              <Eyebrow line className="mb-6">
                 {profile.role}
-              </p>
+              </Eyebrow>
             </Reveal>
 
             <h1 className="font-display text-[13vw] leading-[0.92] tracking-tight md:text-[8.5vw] lg:text-[7.5rem]">
@@ -79,7 +79,7 @@ export default async function Home() {
                     className="flex items-center gap-10 font-display text-2xl text-ink/45 md:text-3xl"
                   >
                     {c}
-                    <span className="text-accent">✦</span>
+                    <span className="text-secondary">✦</span>
                   </li>
                 ))}
               </ul>
@@ -91,15 +91,18 @@ export default async function Home() {
         <section id="work" className="px-6 py-24 md:px-10 md:py-32">
           <div className="mx-auto max-w-7xl">
             <Reveal>
-              <div className="mb-14 flex flex-wrap items-end justify-between gap-4">
-                <h2 className="font-display text-4xl tracking-tight md:text-6xl">
-                  Selected Work
-                </h2>
-                <p className="text-sm text-muted">2022 — 2025 · 선별 프로젝트</p>
-              </div>
+              <SectionHeading className="mb-14" meta="2022 — 2025 · 선별 프로젝트">
+                Selected Work
+              </SectionHeading>
             </Reveal>
 
-            <WorkGallery projects={projects} />
+            <div className="grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
+              {projects.map((p, i) => (
+                <Reveal key={p.id} delay={(i % 3) * 120}>
+                  <ProjectCard project={p} index={i} />
+                </Reveal>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -107,9 +110,7 @@ export default async function Home() {
         <section id="about" className="bg-ink px-6 py-24 text-paper md:px-10 md:py-32">
           <div className="mx-auto grid max-w-7xl gap-12 md:grid-cols-12">
             <Reveal className="md:col-span-4">
-              <p className="font-mono text-xs uppercase tracking-[0.25em] text-paper/50">
-                About
-              </p>
+              <Eyebrow className="text-paper/50">About</Eyebrow>
               <p className="mt-6 font-display text-3xl leading-tight md:text-4xl">
                 {profile.name}
                 <span className="block text-paper/40">{profile.nameEn}</span>
@@ -149,15 +150,13 @@ export default async function Home() {
         <section id="services" className="px-6 py-24 md:px-10 md:py-32">
           <div className="mx-auto max-w-7xl">
             <Reveal>
-              <h2 className="mb-14 font-display text-4xl tracking-tight md:text-6xl">
-                What I Do
-              </h2>
+              <SectionHeading className="mb-14">What I Do</SectionHeading>
             </Reveal>
             <div className="border-t border-ink/15">
               {services.map((s, i) => (
                 <Reveal key={s.no} delay={i * 80}>
                   <div className="group grid grid-cols-1 items-baseline gap-4 border-b border-ink/15 py-8 transition-colors hover:bg-ink/[0.03] md:grid-cols-[auto_1fr_2fr] md:gap-10 md:px-4">
-                    <span className="font-mono text-sm text-accent">{s.no}</span>
+                    <span className="font-mono text-sm text-secondary">{s.no}</span>
                     <h3 className="font-display text-2xl tracking-tight md:text-3xl">
                       {s.title}
                     </h3>
@@ -178,9 +177,9 @@ export default async function Home() {
         >
           <div className="mx-auto max-w-7xl text-center">
             <Reveal>
-              <p className="font-mono text-xs uppercase tracking-[0.25em] text-muted">
+              <Eyebrow tone="primary" className="justify-center">
                 Let’s work together
-              </p>
+              </Eyebrow>
             </Reveal>
             <Reveal delay={120}>
               <a

@@ -1,27 +1,24 @@
-"use client";
-
+import Link from "next/link";
 import type { Project } from "@/lib/types";
+import Tag from "@/components/ui/Tag";
 
 export default function ProjectCard({
   project,
   index,
-  onOpen,
 }: {
   project: Project;
   index: number;
-  onOpen: (project: Project) => void;
 }) {
   const [from, to] = project.palette.length >= 2 ? project.palette : ["#ddd8cf", "#2b2b2b"];
   const hasImage = Boolean(project.image_url);
 
   return (
-    <button
-      type="button"
-      onClick={() => onOpen(project)}
-      className="group block w-full text-left"
-      aria-label={`${project.title} 전체 이미지 보기`}
+    <Link
+      href={`/work/${project.slug}`}
+      className="group block"
+      aria-label={`${project.title} 상세 보기`}
     >
-      <div className="relative aspect-[4/5] cursor-pointer overflow-hidden rounded-lg bg-ink/5">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-ink/5">
         {hasImage ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -52,9 +49,9 @@ export default function ProjectCard({
           {String(index + 1).padStart(2, "0")}
         </span>
 
-        {/* 호버 시 "전체 보기" 힌트 */}
+        {/* 호버 시 상세 보기 힌트 */}
         <span className="pointer-events-none absolute bottom-5 right-5 flex h-12 w-12 items-center justify-center rounded-full bg-paper text-ink opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-          ↗
+          →
         </span>
       </div>
 
@@ -67,14 +64,11 @@ export default function ProjectCard({
       </p>
       <ul className="mt-3 flex flex-wrap gap-2">
         {project.tags.map((t) => (
-          <li
-            key={t}
-            className="rounded-full border border-ink/15 px-3 py-1 text-xs text-ink/70"
-          >
-            {t}
+          <li key={t}>
+            <Tag>{t}</Tag>
           </li>
         ))}
       </ul>
-    </button>
+    </Link>
   );
 }

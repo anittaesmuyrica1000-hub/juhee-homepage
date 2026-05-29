@@ -21,3 +21,22 @@ export async function getProjects(): Promise<Project[]> {
     return [];
   }
 }
+
+/** slug 로 단일 프로젝트 조회 (상세 페이지용). 없으면 null. */
+export async function getProjectBySlug(slug: string): Promise<Project | null> {
+  try {
+    const { data, error } = await getPublicClient()
+      .from("projects")
+      .select("*")
+      .eq("slug", slug)
+      .maybeSingle();
+    if (error) {
+      console.error("[getProjectBySlug]", error.message);
+      return null;
+    }
+    return (data as Project) ?? null;
+  } catch (e) {
+    console.error("[getProjectBySlug]", e);
+    return null;
+  }
+}

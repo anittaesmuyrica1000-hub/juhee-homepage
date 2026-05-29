@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Button from "@/components/ui/Button";
 
 const LINKS = [
   { href: "#work", label: "Work" },
@@ -47,12 +48,9 @@ export default function Nav() {
             </li>
           ))}
           <li>
-            <a
-              href="#contact"
-              className="rounded-full bg-ink px-5 py-2 text-paper transition-transform hover:-translate-y-0.5"
-            >
+            <Button href="/#contact" variant="primary" size="sm">
               작업 의뢰
-            </a>
+            </Button>
           </li>
         </ul>
 

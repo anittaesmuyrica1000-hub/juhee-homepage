@@ -13,6 +13,8 @@ export type EditorValue = {
   tags: string[];
   image_url: string | null;
   palette: string[];
+  body: string;
+  gallery: string[];
 };
 
 const FALLBACK_PALETTE = ["#ddd8cf", "#2b2b2b"];
@@ -37,27 +39,63 @@ export default function ProjectEditor({
   const [palette, setPalette] = useState<string[]>(
     project?.palette?.length ? project.palette : FALLBACK_PALETTE
   );
+  const [body, setBody] = useState(project?.body ?? "");
+  const [gallery, setGallery] = useState<string[]>(project?.gallery ?? []);
 
   const [uploading, setUploading] = useState(false);
+  const [galleryUploading, setGalleryUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+
+  // 단일 파일 업로드 → 공개 URL 반환
+  async function uploadOne(file: File): Promise<string> {
+    const form = new FormData();
+    form.append("file", file);
+    const res = await fetch("/api/admin/upload", { method: "POST", body: form });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || "업로드 실패");
+    return data.url as string;
+  }
 
   async function handleUpload(file: File) {
     setUploading(true);
     setError("");
     try {
-      const form = new FormData();
-      form.append("file", file);
-      const res = await fetch("/api/admin/upload", { method: "POST", body: form });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "업로드 실패");
-      setImageUrl(data.url);
+      setImageUrl(await uploadOne(file));
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
       setUploading(false);
     }
+  }
+
+  async function handleGalleryUpload(files: FileList) {
+    setGalleryUploading(true);
+    setError("");
+    try {
+      const urls = await Promise.all(Array.from(files).map((f) => uploadOne(f)));
+      setGallery((prev) => [...prev, ...urls]);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setGalleryUploading(false);
+    }
+  }
+
+  function removeGalleryItem(idx: number) {
+    setGallery((prev) => prev.filter((_, i) => i !== idx));
+  }
+
+  function moveGalleryItem(idx: number, dir: -1 | 1) {
+    setGallery((prev) => {
+      const next = [...prev];
+      const j = idx + dir;
+      if (j < 0 || j >= next.length) return prev;
+      [next[idx], next[j]] = [next[j], next[idx]];
+      return next;
+    });
   }
 
   async function submit(e: React.FormEvent) {
@@ -78,6 +116,8 @@ export default function ProjectEditor({
           .filter(Boolean),
         image_url: imageUrl,
         palette,
+        body: body.trim(),
+        gallery,
       });
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -185,6 +225,15 @@ export default function ProjectEditor({
             태그 (쉼표로 구분)
             <input className={field} value={tagsText} onChange={(e) => setTagsText(e.target.value)} placeholder="로고, 아이덴티티, 패키지" />
           </label>
+          <label className="block text-sm sm:col-span-2">
+            상세 본문 <span className="text-muted">(포트폴리오 페이지에 표시 · 빈 줄로 문단 구분)</span>
+            <textarea
+              className={`${field} min-h-40`}
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              placeholder={"프로젝트 배경, 접근, 결과 등을 작성하세요.\n\n빈 줄로 문단을 나눌 수 있습니다."}
+            />
+          </label>
         </div>
 
         {/* 팔레트 (이미지 없을 때 폴백) */}
@@ -206,6 +255,52 @@ export default function ProjectEditor({
               />
             ))}
           </div>
+        </div>
+
+        {/* 갤러리 (상세 페이지 추가 이미지) */}
+        <div className="mt-6">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">
+              갤러리 이미지 <span className="text-muted">(포트폴리오 페이지)</span>
+            </span>
+            <input
+              ref={galleryInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files?.length) handleGalleryUpload(e.target.files);
+                e.target.value = "";
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => galleryInputRef.current?.click()}
+              disabled={galleryUploading}
+              className="rounded-full border border-ink/20 px-3 py-1.5 text-sm hover:bg-ink hover:text-paper disabled:opacity-40"
+            >
+              {galleryUploading ? "업로드 중…" : "+ 이미지 추가"}
+            </button>
+          </div>
+
+          {gallery.length > 0 ? (
+            <ul className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
+              {gallery.map((src, i) => (
+                <li key={src + i} className="group relative aspect-square overflow-hidden rounded-lg bg-ink/5">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={src} alt="" className="h-full w-full object-cover" />
+                  <div className="absolute inset-0 flex items-center justify-center gap-1 bg-ink/50 opacity-0 transition-opacity group-hover:opacity-100">
+                    <button type="button" onClick={() => moveGalleryItem(i, -1)} className="rounded bg-paper/90 px-2 py-1 text-xs" aria-label="앞으로">←</button>
+                    <button type="button" onClick={() => removeGalleryItem(i)} className="rounded bg-accent px-2 py-1 text-xs text-paper" aria-label="삭제">✕</button>
+                    <button type="button" onClick={() => moveGalleryItem(i, 1)} className="rounded bg-paper/90 px-2 py-1 text-xs" aria-label="뒤로">→</button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-2 text-xs text-muted">추가 이미지를 올리면 상세 페이지 하단에 순서대로 표시됩니다.</p>
+          )}
         </div>
 
         {error && <p className="mt-4 text-sm text-accent">{error}</p>}

@@ -33,6 +33,8 @@ export async function PUT(req: Request, { params }: Params) {
     "tags",
     "image_url",
     "palette",
+    "body",
+    "gallery",
     "sort_order",
   ] as const) {
     if (key in body) patch[key] = body[key];

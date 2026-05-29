@@ -51,3 +51,7 @@ When you add or modify a feature, **automatically commit and push to `origin/mai
    ```
 
 Exceptions — do **not** auto-push for: work the user explicitly asked to keep local, experimental/incomplete changes, or anything where the build fails. When skipping, say so.
+
+### Test screenshots
+
+Save ALL test/verification screenshots (Playwright captures, debugging shots) to the **`screenshots/`** folder — e.g. `browser_take_screenshot` with `filename: "screenshots/<name>.png"`. Never drop them in the repo root or commit them; `screenshots/` is gitignored.

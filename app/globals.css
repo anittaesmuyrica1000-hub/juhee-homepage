@@ -7,11 +7,20 @@
   --font-display: var(--font-roboto), "Pretendard", ui-sans-serif, system-ui,
     "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
 
-  /* 모노크롬 + 시그니처 레드 (Plus X red ≈ #db1010) */
+  /* ── 브랜드 컬러 ─────────────────────────────
+     primary = orange (주 강조), secondary = green (보조 강조) */
+  --color-primary: #f15a24;        /* orange */
+  --color-primary-strong: #d6471a; /* hover/press */
+  --color-secondary: #1f9d55;      /* green */
+  --color-secondary-strong: #178047;
+
+  /* 중립 */
   --color-ink: #0a0a0a;
   --color-paper: #ffffff;
-  --color-accent: #db1010;
   --color-muted: #8a8a8a;
+
+  /* accent = primary 별칭 (기존 text-accent/bg-accent 호환) */
+  --color-accent: #f15a24;
 }
 
 @font-face {

@@ -42,7 +42,8 @@ yarn-error.log*
 # local dev artifacts (screenshots, scratch files)
 .tmp/
 .playwright-mcp/
-/*.png
+# 테스트/검증 스크린샷은 이 폴더에만 저장 (커밋 안 함)
+screenshots/
 
 # typescript
 *.tsbuildinfo
